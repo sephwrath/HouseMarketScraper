@@ -31,16 +31,18 @@ while(remainingPages > 0) {
   resultsList <- json_data$tieredResults[[1]]$results
   # loop through each of the results in results list
   for (item in resultsList) {
-
-    #result1 <- json_data$tieredResults[[1]]$results[[1]]
     
     # get the number or views
-    listingId <- result1$listingId
+    listingId <- item$listingId
     webpage <- getURL(paste(viewsUrl, listingId, sep=""))
+    print(paste("View count request for: ",  listingId, sep=""))
+    
     number <- sub(".*page-views__page-views-box-count\">(.*?)<.*", "\\1", webpage, ignore.case = T)
+    print(paste("Request result: ", number, sep=""))
     
     # need to do this for each of the list items
     df<-data.frame(bathrooms=item$generalFeatures$bathrooms$value
+                   , views=number
                    , lat=0 # put whatever you like here
                    , lng=0)
 
