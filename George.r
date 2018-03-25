@@ -54,7 +54,7 @@ while(remainingPages > 0) {
                    , bathrooms=nChk(item$generalFeatures$bathrooms$value)
                    , bedrooms= nChk(item$generalFeatures$bedrooms$value)
                    , parkingSpaces = nChk(item$generalFeatures$parkingSpaces$value)
-                   , views=as.numeric(number)
+                   , views=as.numeric(gsub(",", "", number))
                    , modifiedDate = nChk(item$modifiedDate$value)
                    , lat=nChk(item$address$location$latitude) # put whatever you like here
                    , lng=nChk(item$address$location$longitude))
