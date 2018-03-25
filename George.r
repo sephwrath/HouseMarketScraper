@@ -43,19 +43,19 @@ while(remainingPages > 0) {
     
     # need to do this for each of the list items
     df<-data.frame(id = item$listingId
-                   , price = item$price$display
-                   , title = item$title
-                   , streetAddress = item$address$streetAddress
+                   , price = nChk(item$price$display)
+                   , title = nChk(item$title)
+                   , streetAddress = nChk(item$address$streetAddress)
                    , locality = nChk(item$address$locality)
-                   , postCode = item$address$postcode
-                   , agencyName = item$agency$name
-                   , agencyId = item$agency$agencyId
-                   , agencyListingId = item$agencyListingId
+                   , postCode = nChk(item$address$postcode)
+                   , agencyName = nChk(item$agency$name)
+                   , agencyId = nChk(item$agency$agencyId)
+                   , agencyListingId = nChk(item$agencyListingId)
                    , bathrooms=nChk(item$generalFeatures$bathrooms$value)
                    , bedrooms= nChk(item$generalFeatures$bedrooms$value)
                    , parkingSpaces = nChk(item$generalFeatures$parkingSpaces$value)
                    , views=as.numeric(number)
-                   , modifiedDate = item$modifiedDate$value
+                   , modifiedDate = nChk(item$modifiedDate$value)
                    , lat=nChk(item$address$location$latitude) # put whatever you like here
                    , lng=nChk(item$address$location$longitude))
 
