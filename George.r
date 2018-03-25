@@ -2,6 +2,7 @@ setwd("C:\\Users\\Stephen\\Documents\\helping george")
 
 install.packages("rjson")
 install.packages("RCurl")
+install.packages("httr")
 
 library("rjson")
 library("RCurl")
@@ -42,7 +43,7 @@ while(remainingPages > 0) {
     
     # need to do this for each of the list items
     df<-data.frame(bathrooms=item$generalFeatures$bathrooms$value
-                   , views=number
+                   , views=as.numeric(number)
                    , lat=0 # put whatever you like here
                    , lng=0)
 
@@ -68,4 +69,5 @@ while(remainingPages > 0) {
 } 
 
 ## output temp files
-write.csv2(houseDf, "houseList12Jan.csv")
+
+write.csv(houseDf, "houseList12Jan.csv")
