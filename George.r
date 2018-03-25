@@ -42,10 +42,22 @@ while(remainingPages > 0) {
     print(paste("Request result: ", number, sep=""))
     
     # need to do this for each of the list items
-    df<-data.frame(bathrooms=item$generalFeatures$bathrooms$value
+    df<-data.frame(id = item$listingId
+                   , price = item$price$display
+                   , title = item$title
+                   , streetAddress = item$address$streetAddress
+                   , locality = nChk(item$address$locality)
+                   , postCode = item$address$postcode
+                   , agencyName = item$agency$name
+                   , agencyId = item$agency$agencyId
+                   , agencyListingId = item$agencyListingId
+                   , bathrooms=nChk(item$generalFeatures$bathrooms$value)
+                   , bedrooms= nChk(item$generalFeatures$bedrooms$value)
+                   , parkingSpaces = nChk(item$generalFeatures$parkingSpaces$value)
                    , views=as.numeric(number)
-                   , lat=0 # put whatever you like here
-                   , lng=0)
+                   , modifiedDate = item$modifiedDate$value
+                   , lat=nChk(item$address$location$latitude) # put whatever you like here
+                   , lng=nChk(item$address$location$longitude))
 
     #tempList<-do.call(rbind, df)
     houseDf<-rbind(houseDf, df)
@@ -70,4 +82,4 @@ while(remainingPages > 0) {
 
 ## output temp files
 
-write.csv(houseDf, "houseList12Jan.csv")
+write.csv(houseDf, "houseList.csv")
