@@ -14,10 +14,10 @@ nChk<- function(var) {
   ifelse(is.null(var), NA, var)
 }
 
-houseList <- "https://services.realestate.com.au/services/listings/search?query={%22channel%22:%22new_homes%22
-  ,%22filters%22:{%22excludeProjectListings%22:true,%22surroundingSuburbs%22:true,%22priceRange%22:{%22minimum%22
-  :%22any%22,%22maximum%22:%22any%22},%22bedroomsRange%22:{%22minimum%22:%22any%22,%22maximum%22:%22any%22}
-  ,%22minimumBathroom%22:%22any%22,%22minimumCars%22:%22any%22},%22pageSize%22:200,%22page%22:%22"
+houseList <- paste("https://services.realestate.com.au/services/listings/search?query={%22channel%22:%22new_homes%22",
+  ",%22filters%22:{%22excludeProjectListings%22:true,%22surroundingSuburbs%22:true,%22priceRange%22:{%22minimum%22",
+  ":%22any%22,%22maximum%22:%22any%22},%22bedroomsRange%22:{%22minimum%22:%22any%22,%22maximum%22:%22any%22}",
+  ",%22minimumBathroom%22:%22any%22,%22minimumCars%22:%22any%22},%22pageSize%22:200,%22page%22:%22", sep="")
 houseList2 <- "%22,%22sortType%22:%22relevance%22,%22localities%22:[{%22locality%22:%22wa%22}]}"
 
 viewsUrl <- "https://www.realestate.com.au/pdpvisits.ds?id="
@@ -30,7 +30,8 @@ houseDf<-data.frame()
 while(remainingPages > 0) {
   houseJsonUrl <- paste(houseList, currentPage, houseList2, sep="")
   
-  json_data <- fromJSON(readLines(houseJsonUrl))
+  # I've put getURL here hopefully this works
+  json_data <- fromJSON(getURL(houseJsonUrl))
   
   resultsList <- json_data$tieredResults[[1]]$results
   # loop through each of the results in results list
