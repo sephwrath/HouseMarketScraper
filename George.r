@@ -1,11 +1,14 @@
-setwd("C:\\Users\\Stephen\\Documents\\helping george")
+setwd("C:\\Users\\Stephen\\Documents\\projects\\helping george")
 
 install.packages("rjson")
 install.packages("RCurl")
 install.packages("httr")
 
+install.packages("dplyr")
+
 library("rjson")
 library("RCurl")
+library(dplyr)
 
 nChk<- function(var) {
   ifelse(is.null(var), NA, var)
@@ -33,53 +36,60 @@ while(remainingPages > 0) {
   # loop through each of the results in results list
   for (item in resultsList) {
     
-    # get the number or views
     listingId <- item$listingId
-    webpage <- getURL(paste(viewsUrl, listingId, sep=""))
-    print(paste("View count request for: ",  listingId, sep=""))
     
-    number <- sub(".*page-views__page-views-box-count\">(.*?)<.*", "\\1", webpage, ignore.case = T)
-    print(paste("Request result: ", number, sep=""))
-    
-    # need to do this for each of the list items
-    df<-data.frame(id = item$listingId
-                   , price = nChk(item$price$display)
-                   , title = nChk(item$title)
-                   , streetAddress = nChk(item$address$streetAddress)
-                   , locality = nChk(item$address$locality)
-                   , postCode = nChk(item$address$postcode)
-                   , agencyName = nChk(item$agency$name)
-                   , agencyId = nChk(item$agency$agencyId)
-                   , agencyListingId = nChk(item$agencyListingId)
-                   , bathrooms=nChk(item$generalFeatures$bathrooms$value)
-                   , bedrooms= nChk(item$generalFeatures$bedrooms$value)
-                   , parkingSpaces = nChk(item$generalFeatures$parkingSpaces$value)
-                   , views=as.numeric(gsub(",", "", number))
-                   , modifiedDate = nChk(item$modifiedDate$value)
-                   , lat=nChk(item$address$location$latitude) # put whatever you like here
-                   , lng=nChk(item$address$location$longitude))
-
-    #tempList<-do.call(rbind, df)
-    houseDf<-rbind(houseDf, df)
-    
-    ## old cold that might get used if I cant get it to work the other way
-    # Process escape characters
-    #webpage <- readLines(tc <- textConnection(webpage)); close(tc)
-    # Parse the html tree, ignoring errors on the page
-    #pagetree <- htmlTreeParse(webpage, error=function(...){})
+    # test if it exists in the list and only readd if it isn't there
+    if (nrow(houseDf) == 0 || count(filter(houseDf, id == listingId)) != 1) {
+      # get the number or views
+      webpage <- getURL(paste(viewsUrl, listingId, sep=""))
+      print(paste("View count request for: ",  listingId, sep=""))
+      
+      number <- sub(".*page-views__page-views-box-count\">(.*?)<.*", "\\1", webpage, ignore.case = T)
+      print(paste("Request result: ", number, sep=""))
+      
+      # need to do this for each of the list items
+      df<-data.frame(id = listingId
+                     , price = nChk(item$price$display)
+                     , title = nChk(item$title)
+                     , streetAddress = nChk(item$address$streetAddress)
+                     , locality = nChk(item$address$locality)
+                     , postCode = nChk(item$address$postcode)
+                     , agencyName = nChk(item$agency$name)
+                     , agencyId = nChk(item$agency$agencyId)
+                     , agencyListingId = nChk(item$agencyListingId)
+                     , bathrooms=nChk(item$generalFeatures$bathrooms$value)
+                     , bedrooms= nChk(item$generalFeatures$bedrooms$value)
+                     , parkingSpaces = nChk(item$generalFeatures$parkingSpaces$value)
+                     , views=as.numeric(gsub(",", "", number))
+                     , modifiedDate = nChk(item$modifiedDate$value)
+                     , lat=nChk(item$address$location$latitude) # put whatever you like here
+                     , lng=nChk(item$address$location$longitude))
+  
+      #tempList<-do.call(rbind, df)
+      houseDf<-rbind(houseDf, df)
+      
+      ## old cold that might get used if I cant get it to work the other way
+      # Process escape characters
+      #webpage <- readLines(tc <- textConnection(webpage)); close(tc)
+      # Parse the html tree, ignoring errors on the page
+      #pagetree <- htmlTreeParse(webpage, error=function(...){})
+    }
   }
   
   # this isn't in a loop
   if (currentPage == 1) {
     recordCount <- json_data$totalResultsCount
-    remainingPages = recordCount/200
+    #remainingPages = recordCount/200
   }
   currentPage = currentPage + 1
-  remainingPages = remainingPages - 1
+  
+  # modified to use the number of records in the dataFrame so it won't stop till the records in the df = the records
+  # in the count - this is because duplicates seem to be returned from the page call for some reason
+  remainingPages = (recordCount - count(houseDf))/200
   print(paste("current page ", currentPage, sep=""))
   
 } 
 
 ## output temp files
-
-write.csv(houseDf, "houseList.csv")
+# there seem to be duplicates look into why this is
+write.csv(unique(houseDf), "houseList.csv")
