@@ -9,6 +9,7 @@ install.packages("dplyr")
 library("rjson")
 library("RCurl")
 library(dplyr)
+library(httr)
 
 nChk<- function(var) {
   ifelse(is.null(var), NA, var)
@@ -31,7 +32,9 @@ while(remainingPages > 0) {
   houseJsonUrl <- paste(houseList, currentPage, houseList2, sep="")
   
   # I've put getURL here hopefully this works
-  json_data <- fromJSON(getURL(houseJsonUrl))
+  resp <- GET(houseJsonUrl,
+      user_agent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2"))
+  json_data <- fromJSON(content(resp, as="text"))
   
   resultsList <- json_data$tieredResults[[1]]$results
   # loop through each of the results in results list
