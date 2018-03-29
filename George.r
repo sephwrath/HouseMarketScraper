@@ -1,20 +1,3 @@
-setwd("C:\\Users\\Stephen\\Documents\\projects\\helping george")
-
-install.packages("rjson")
-install.packages("RCurl")
-install.packages("httr")
-
-install.packages("dplyr")
-
-library("rjson")
-library("RCurl")
-library(dplyr)
-library(httr)
-
-nChk<- function(var) {
-  ifelse(is.null(var), NA, var)
-}
-
 houseList <- paste("https://services.realestate.com.au/services/listings/search?query={%22channel%22:%22new_homes%22",
   ",%22filters%22:{%22excludeProjectListings%22:true,%22surroundingSuburbs%22:true,%22priceRange%22:{%22minimum%22",
   ":%22any%22,%22maximum%22:%22any%22},%22bedroomsRange%22:{%22minimum%22:%22any%22,%22maximum%22:%22any%22}",
@@ -83,13 +66,13 @@ while(remainingPages > 0) {
   # this isn't in a loop
   if (currentPage == 1) {
     recordCount <- json_data$totalResultsCount
-    #remainingPages = recordCount/200
+    remainingPages = recordCount/200
   }
   currentPage = currentPage + 1
   
   # modified to use the number of records in the dataFrame so it won't stop till the records in the df = the records
   # in the count - this is because duplicates seem to be returned from the page call for some reason
-  remainingPages = (recordCount - count(houseDf))/200
+  remainingPages = remainingPages - 1
   print(paste("current page ", currentPage, sep=""))
   
 } 
